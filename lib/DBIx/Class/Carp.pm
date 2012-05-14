@@ -49,7 +49,7 @@ sub __find_caller {
     $ln,
     $calling =~ /::/ ? "$calling(): " : "$calling: ", # cargo-cult from Carp::Clan
   );
-};
+}
 
 my $warn = sub {
   my ($ln, @warn) = @_;
