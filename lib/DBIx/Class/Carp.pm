@@ -81,6 +81,17 @@ sub import {
     );
   };
 
+  my $fired_u = {};
+  *{"${into}::carp_once_if"} = sub (&$) {
+    return if $fired_u->{$_[1]} || !$_[0]->($_[1]);
+    $fired_u->{$_[1]} = 1;
+
+    $warn->(
+      __find_caller($skip_pattern, $into),
+      @_,
+    );
+  };
+
   my $fired = {};
   *{"${into}::carp_once"} = sub {
     return if $fired->{$_[0]};
@@ -102,6 +113,23 @@ sub import {
 
     return if $seen->{$ln}{$msg};
     $seen->{$ln}{$msg} = 1;
+
+    $warn->(
+      $ln,
+      $msg,
+    );
+  };
+
+  my $seen_u;
+  *{"${into}::carp_unique_if"} = sub (&$) {
+    my ($ln, $calling) = __find_caller($skip_pattern, $into);
+    my $msg = join ('', $calling, $_[1]);
+
+    # unique carping with a hidden caller makes no sense
+    $msg =~ s/\n+$//;
+
+    return if $seen_u->{$ln}{$msg} ||!$_[0]->($msg);
+    $seen_u->{$ln}{$msg} = 1;
 
     $warn->(
       $ln,
