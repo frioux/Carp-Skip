@@ -7,23 +7,23 @@ BEGIN { $ENV{DBIC_TRACE} = 0 }
 use Test::More;
 use Test::Warn;
 use Test::Exception;
-use DBIx::Class::Carp;
+use Carp::Skip;
 use lib 't/lib';
 
 {
-  sub DBICTest::DBICCarp::frobnicate {
-    DBICTest::DBICCarp::branch1();
-    DBICTest::DBICCarp::branch2();
-    DBICTest::DBICCarp::branch3();
+  sub A::frobnicate {
+    A::branch1();
+    A::branch2();
+    A::branch3();
   }
 
-  sub DBICTest::DBICCarp::branch1 { carp_once 'carp1' }
-  sub DBICTest::DBICCarp::branch2 { carp_once 'carp2' }
-  sub DBICTest::DBICCarp::branch3 { carp_unique 'carp3' }
+  sub A::branch1 { carp_once 'carp1' }
+  sub A::branch2 { carp_once 'carp2' }
+  sub A::branch3 { carp_unique 'carp3' }
 
 
   warnings_exist {
-    DBICTest::DBICCarp::frobnicate();
+    A::frobnicate();
   } [
     qr/carp1/,
     qr/carp2/,
@@ -31,18 +31,18 @@ use lib 't/lib';
   ], 'expected warnings from carp_once';
 
    warnings_exist {
-     DBICTest::DBICCarp::frobnicate();
+     A::frobnicate();
    } [qr/carp3/], 'carp_unique fires for new callsite';
 
    warnings_are {
-     DBICTest::DBICCarp::branch1();
-     DBICTest::DBICCarp::branch2();
+     A::branch1();
+     A::branch2();
    } [], 'still no warnings from carp_once again';
 
    for (1, 0) {
       my $warning = '';
       local $SIG{__WARN__} = sub { $warning = shift };
-      DBICTest::DBICCarp::branch3();
+      A::branch3();
 
       like($warning, ( $_
          ? qr/carp3/

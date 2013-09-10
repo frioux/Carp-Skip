@@ -1,4 +1,4 @@
-package DBIx::Class::Carp;
+package Carp::Skip;
 
 use strict;
 use warnings;
@@ -128,7 +128,7 @@ sub unimport {
 
 =head1 NAME
 
-DBIx::Class::Carp - Provides advanced Carp::Clan-like warning functions for DBIx::Class internals
+Carp::Skip - Provides advanced Carp::Clan-like warning functions for DBIx::Class internals
 
 =head1 DESCRIPTION
 
