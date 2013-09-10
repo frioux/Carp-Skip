@@ -11,8 +11,8 @@ $Carp::Internal{ (__PACKAGE__) }++;
 sub __find_caller {
   my ($skip_pattern, $class) = @_;
 
-  my $skip_class_data = $class->_skip_namespace_frames
-    if ($class and $class->can('_skip_namespace_frames'));
+  my $skip_class_data = $class->CARP_SKIP_FRAME_REGEXP
+    if ($class and $class->can('CARP_SKIP_FRAME_REGEXP'));
 
   $skip_pattern = qr/$skip_pattern|$skip_class_data/
     if $skip_class_data;
@@ -39,9 +39,9 @@ sub __find_caller {
     ) ? $f[3] : undef;
 
     if (
-      $f[0]->can('_skip_namespace_frames')
+      $f[0]->can('CARP_SKIP_FRAME_REGEXP')
         and
-      my $extra_skip = $f[0]->_skip_namespace_frames
+      my $extra_skip = $f[0]->CARP_SKIP_FRAME_REGEXP
     ) {
       $skip_pattern = qr/$skip_pattern|$extra_skip/;
     }
@@ -143,13 +143,13 @@ In addition to the classic interface:
 
 this module also supports a class-data based way to specify the exclusion
 regex. A message is only carped from a callsite that matches neither the
-closed over string, nor the value of L</_skip_namespace_frames> as declared
+closed over string, nor the value of L</CARP_SKIP_FRAME_REGEXP> as declared
 on any callframe already skipped due to the same mechanism. This is to ensure
 that intermediate callsites can declare their own additional skip-namespaces.
 
 =head1 CLASS ATTRIBUTES
 
-=head2 _skip_namespace_frames
+=head2 CARP_SKIP_FRAME_REGEXP
 
 A classdata attribute holding the stringified regex matching callsites that
 should be skipped by the carp methods below. An empty string C<q{}> is treated
@@ -165,7 +165,7 @@ L<DBIx::Class::Schema/throw_exception> or L<DBIx::Class::Exception>.
 =head2 carp
 
 Carps message with the file/line of the first callsite not matching
-L</_skip_namespace_frames> nor the closed-over arguments to
+L</CARP_SKIP_FRAME_REGEXP> nor the closed-over arguments to
 C<use DBIx::Class::Carp>.
 
 =head2 carp_unique
